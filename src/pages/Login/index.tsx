@@ -9,7 +9,7 @@ import {
 	TextField,
 	Typography,
 } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
@@ -44,6 +44,11 @@ const Login: React.FC = () => {
 	const [isLogged, setIsLogged] = useState<boolean>(false);
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const navigate = useNavigate();
+	useEffect(() => {
+		if (localStorage.getItem('token') || sessionStorage.getItem('token')) {
+			navigate('/home');
+		}
+	}, [navigate]);
 
 	const onSubmit: SubmitHandler<TLogin> = async (data) => {
 		const loginPayload = (await dispatch(loginAsyncThunk({ data, isLogged })))
