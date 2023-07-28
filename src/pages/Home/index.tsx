@@ -30,7 +30,6 @@ const Home: React.FC = () => {
 
 		if (token) {
 			dispatch(getNotesAsyncThunk({ token, title: filter, stored, favorite }));
-			console.log(filter, favorite, stored);
 		}
 	}, [dispatch, favorite, stored, filter]);
 

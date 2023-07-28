@@ -6,9 +6,9 @@ import { useNavigate } from 'react-router-dom';
 
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setFavorite } from '../../store/modules/Favorite/favoriteSlice';
-import { hideLoading, showLoading } from '../../store/modules/Loading/loadingSlice';
 import { setStored } from '../../store/modules/Stored/storedSlice';
 import { setTheme } from '../../store/modules/Theme/themeSlice';
+import { logoutUser } from '../../store/modules/Users/usersSlice';
 
 interface MyAppBarToolsProps {
 	big?: boolean;
@@ -24,14 +24,8 @@ const MyAppBarTools: React.FC<MyAppBarToolsProps> = ({ big }) => {
 	const dispatch = useAppDispatch();
 
 	const logout = () => {
-		localStorage.removeItem('token');
-		sessionStorage.removeItem('token');
-
-		dispatch(showLoading());
-		setTimeout(() => {
-			dispatch(hideLoading());
-			navigate('/');
-		}, 3000);
+		dispatch(logoutUser());
+		navigate('/');
 	};
 	const handleChangeTheme = () => {
 		dispatch(setTheme(themeName === 'light' ? 'dark' : 'light'));

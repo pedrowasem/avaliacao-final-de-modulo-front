@@ -2,6 +2,7 @@ import { createAsyncThunk, createEntityAdapter, createSlice } from '@reduxjs/too
 
 import { RootState } from '../..';
 import { axios } from '../../../service/api';
+import { showLoading } from '../Loading/loadingSlice';
 import {
 	CreateNote,
 	DeletedNoteReturn,
@@ -112,19 +113,26 @@ const notesSlice = createSlice({
 	name: 'notes',
 	reducers: {},
 	extraReducers: (builder) => {
+		//Create
 		builder.addCase(createNotesAsyncThunk.fulfilled, (state, action) => {
 			if (action.payload.success) {
 				notesAdapter.addOne(state, action.payload.note);
 			}
 		});
+		builder.addCase(createNotesAsyncThunk.rejected, () => {
+			return notesAdapter.getInitialState();
+		});
+		//List
 		builder.addCase(getNotesAsyncThunk.fulfilled, (state, action) => {
 			if (action.payload.success) {
 				notesAdapter.setAll(state, action.payload.notes);
 			}
+			showLoading();
 		});
 		builder.addCase(getNotesAsyncThunk.rejected, (state) => {
 			notesAdapter.setAll(state, []);
 		});
+		//Update
 		builder.addCase(updateNotesAsyncThunk.fulfilled, (state, action) => {
 			if (action.payload.success) {
 				notesAdapter.updateOne(state, {
@@ -133,11 +141,19 @@ const notesSlice = createSlice({
 				});
 			}
 		});
+		builder.addCase(updateNotesAsyncThunk.rejected, () => {
+			return notesAdapter.getInitialState();
+		});
+		//Delete
 		builder.addCase(deleteNotesAsyncThunk.fulfilled, (state, action) => {
 			if (action.payload.success) {
 				notesAdapter.removeOne(state, action.payload.deletedNote._id);
 			}
 		});
+		builder.addCase(deleteNotesAsyncThunk.rejected, () => {
+			return notesAdapter.getInitialState();
+		});
+		//Favorite
 		builder.addCase(favoriteNotesAsyncThunk.fulfilled, (state, action) => {
 			if (action.payload.success) {
 				notesAdapter.updateOne(state, {
@@ -146,6 +162,10 @@ const notesSlice = createSlice({
 				});
 			}
 		});
+		builder.addCase(favoriteNotesAsyncThunk.rejected, () => {
+			return notesAdapter.getInitialState();
+		});
+		//Store
 		builder.addCase(storeNotesAsyncThunk.fulfilled, (state, action) => {
 			if (action.payload.success) {
 				notesAdapter.updateOne(state, {
@@ -153,6 +173,9 @@ const notesSlice = createSlice({
 					changes: action.payload.updatedData,
 				});
 			}
+		});
+		builder.addCase(storeNotesAsyncThunk.rejected, () => {
+			return notesAdapter.getInitialState();
 		});
 	},
 });

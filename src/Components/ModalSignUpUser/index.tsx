@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Close } from '@mui/icons-material';
-import { Box, Button, Divider, Grid, IconButton, TextField } from '@mui/material';
+import { Box, Button, CircularProgress, Divider, Grid, IconButton, TextField } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -10,8 +10,8 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { buttonProps, inputProps } from '../../configs/Layout';
-import { useAppDispatch } from '../../store/hooks';
-import { showSnackBar } from '../../store/modules/SnackBar/snackBarSlice';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { CreateUserReturn } from '../../store/modules/Users/types';
 import { createLoginAsyncThunk } from '../../store/modules/Users/usersSlice';
 
 const schemaCreateAccount = z
@@ -33,6 +33,7 @@ interface ModalSignupUserProps {
 }
 
 const ModalSignupUser: React.FC<ModalSignupUserProps> = ({ open, changeOpen }) => {
+	const userState = useAppSelector((state) => state.users);
 	const dispatch = useAppDispatch();
 	const {
 		register,
@@ -44,15 +45,9 @@ const ModalSignupUser: React.FC<ModalSignupUserProps> = ({ open, changeOpen }) =
 	});
 
 	const onSubmit: SubmitHandler<TCreateUser> = async (data) => {
-		const user = await dispatch(createLoginAsyncThunk(data));
+		const user = (await dispatch(createLoginAsyncThunk(data))).payload as CreateUserReturn;
 
-		if (!user.payload) {
-			dispatch(showSnackBar('Usuário já existente!'));
-
-			return;
-		}
-		dispatch(showSnackBar('Usuário cadastrado com sucesso!'));
-
+		if (!user.success) return;
 		handleClose();
 	};
 
@@ -143,6 +138,14 @@ const ModalSignupUser: React.FC<ModalSignupUserProps> = ({ open, changeOpen }) =
 						color="secondary"
 						variant="outlined"
 						type="submit"
+						disabled={userState.loading}
+						startIcon={
+							userState.loading ? (
+								<CircularProgress size={30} color="secondary" />
+							) : (
+								<></>
+							)
+						}
 						sx={[buttonProps, { width: '30%', marginBottom: 0 }]}>
 						Cadastrar
 					</Button>

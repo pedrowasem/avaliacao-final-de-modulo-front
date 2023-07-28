@@ -20,7 +20,6 @@ import { SnackBarComp } from '../../Components/SnackBar';
 import { buttonProps, inputProps } from '../../configs/Layout';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { hideLoading, showLoading } from '../../store/modules/Loading/loadingSlice';
-import { showSnackBar } from '../../store/modules/SnackBar/snackBarSlice';
 import { LoginReturn } from '../../store/modules/Users/types';
 import { loginAsyncThunk } from '../../store/modules/Users/usersSlice';
 
@@ -31,6 +30,7 @@ const schemaLogin = z.object({
 
 type TLogin = z.infer<typeof schemaLogin>;
 const Login: React.FC = () => {
+	const userState = useAppSelector((state) => state.users);
 	const dispatch = useAppDispatch();
 	const user = useAppSelector((state) => state.users);
 	const {
@@ -46,19 +46,16 @@ const Login: React.FC = () => {
 	const navigate = useNavigate();
 
 	const onSubmit: SubmitHandler<TLogin> = async (data) => {
-		const loginPayload = (await dispatch(loginAsyncThunk(data))).payload as LoginReturn;
+		const loginPayload = (await dispatch(loginAsyncThunk({ data, isLogged })))
+			.payload as LoginReturn;
 
 		if (!loginPayload.success) {
-			dispatch(showSnackBar('Erro ao realizar o login'));
 			return;
 		}
-		const token = loginPayload.token;
-		isLogged ? localStorage.setItem('token', token) : sessionStorage.setItem('token', token);
 		dispatch(showLoading());
-		setTimeout(() => {
-			dispatch(hideLoading());
-			navigate('/home');
-		}, 3000);
+		if (!userState.loading) dispatch(hideLoading());
+
+		navigate('/home');
 
 		return user;
 	};

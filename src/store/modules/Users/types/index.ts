@@ -6,7 +6,7 @@ export interface CreateUser {
 
 export interface CreateUserReturn {
 	message: string;
-	sucess: boolean;
+	success: boolean;
 	user: User;
 }
 
@@ -18,6 +18,7 @@ export interface Login {
 export interface User {
 	_id: string;
 	_name: string;
+	loading: boolean;
 }
 
 export interface UserReturn {
@@ -27,6 +28,7 @@ export interface UserReturn {
 }
 
 export interface LoginReturn {
+	isLogged: boolean;
 	message: string;
 	success: boolean;
 	token: string;
